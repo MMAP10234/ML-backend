@@ -18,7 +18,6 @@ model Admin {
   id      String @id @default(uuid())
   name     String
   email    String @unique
-  password String
   websites Website[]
 }
 
@@ -28,7 +27,7 @@ model Website {
   url            String
   customerCare   String?
   domain         String
-  notes          Json[]
+  notes          Note[]
   adminId        String
   admin          Admin  @relation(fields: [adminId], references: [id], onDelete: Cascade)
   sessions      Session[]
@@ -61,4 +60,12 @@ model Session {
 
   website Website @relation(fields: [webId], references: [id])
   responses      Response[]
+}
+
+model Note {
+  id        String @id @default(uuid())
+  title     String
+  content   String
+  webId     String
+  website   Website @relation(fields: [webId], references: [id])
 }
