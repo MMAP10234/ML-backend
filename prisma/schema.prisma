@@ -1,0 +1,64 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+
+model Admin {
+  id      String @id @default(uuid())
+  name     String
+  email    String @unique
+  password String
+  websites Website[]
+}
+
+model Website {
+  id             String  @id @default(uuid())
+  name           String
+  url            String
+  customerCare   String?
+  domain         String
+  notes          Json[]
+  adminId        String
+  admin          Admin  @relation(fields: [adminId], references: [id], onDelete: Cascade)
+  sessions      Session[]
+  embeddings     WebsiteEmbeddings[]
+
+}
+
+model WebsiteEmbeddings {
+  id      String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  content String
+  vector  Unsupported("vector")?
+  webId String
+  website Website @relation(fields: [webId], references: [id], onDelete: Cascade) 
+}
+
+model Response {
+  id        String @id @default(uuid())
+  query     String
+  response  String
+  category  String
+  sessionId String
+  session Session @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+}
+
+
+model Session {
+  id String @id @default(cuid())
+  webId String
+
+  website Website @relation(fields: [webId], references: [id])
+  responses      Response[]
+}
